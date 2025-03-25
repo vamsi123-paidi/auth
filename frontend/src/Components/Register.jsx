@@ -3,55 +3,44 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
+    // Proper state initialization
     const [formData, setFormData] = useState({
         username: '',
         email: '',
         password: ''
-      });
-      const [error, setError] = useState('');
-      const [isLoading, setIsLoading] = useState(false);
-      const navigate = useNavigate();
-    
-      const handleSubmit = async (e) => {
+    });
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
+
+    // Handle input changes
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
-        setIsLoading(true);
-    
         try {
-          const response = await axios.post(
-            'https://auth-epv2.onrender.com/api/auth/register',
-            formData,
-            {
-              withCredentials: true,
-              headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-              },
-              timeout: 10000 // 10 second timeout
-            }
-          );
-    
-          if (response.status === 201) {
+            const res = await axios.post(
+                'https://auth-epv2.onrender.com/api/auth/register', 
+                formData, 
+                { 
+                    withCredentials: true,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+            console.log(res.data.message);
             navigate('/login');
-          }
         } catch (err) {
-          if (err.code === 'ECONNABORTED') {
-            setError('Request timeout. Please try again.');
-          } else if (err.response) {
-            // Server responded with error status
-            setError(err.response.data?.message || 'Registration failed');
-          } else if (err.request) {
-            // Request was made but no response
-            setError('Network error. Please check your connection.');
-          } else {
-            setError('An unexpected error occurred');
-          }
-          console.error('Registration error:', err);
-        } finally {
-          setIsLoading(false);
+            setError(err.response?.data?.error || 'Registration failed. Please try again.');
+            console.error('Registration error:', err);
         }
-      };
-    
+    };
 
     return (
         <div>
@@ -62,9 +51,10 @@ const Register = () => {
                     <label>Username:</label>
                     <input
                         type="text"
+                        name="username"
                         placeholder="Enter your username"
                         value={formData.username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        onChange={handleChange}
                         required
                     />
                 </div>
@@ -72,9 +62,10 @@ const Register = () => {
                     <label>Email:</label>
                     <input
                         type="email"
+                        name="email"
                         placeholder="Enter your email"
                         value={formData.email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        onChange={handleChange}
                         required
                     />
                 </div>
@@ -82,9 +73,10 @@ const Register = () => {
                     <label>Password:</label>
                     <input
                         type="password"
+                        name="password"
                         placeholder="Enter your password"
                         value={formData.password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        onChange={handleChange}
                         required
                     />
                 </div>
