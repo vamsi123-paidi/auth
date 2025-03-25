@@ -10,29 +10,12 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-const allowedOrigins = [
-  'https://auth-red-three.vercel.app',
-  'http://localhost:3000',
-  'http://localhost:5173'
-];
-
+app.use(express.json());
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  credentials: true,
-  exposedHeaders: ['set-cookie']
+  origin: 'https://auth-red-three.vercel.app', // Allow requests from your frontend
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
 }));
-
-
-// Explicitly handle OPTIONS requests
-app.options('*', cors());
 
 // Routes
 app.use('/api/auth', authRoutes);
