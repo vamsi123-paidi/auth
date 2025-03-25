@@ -45,7 +45,7 @@ const Login = () => {
                 if (res.data.user) {
                     localStorage.setItem('user', JSON.stringify(res.data.user));
                 }
-                navigate('/dashboard'); // Redirect to protected route
+                console.log("user logeed in sucessfully") // Redirect to protected route
             }
         } catch (err) {
             setError(
