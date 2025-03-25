@@ -12,7 +12,7 @@ const Register = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post('https://auth-epv2.onrender.com', { username, email, password }, { withCredentials: true });
+            const res = await axios.post('https://auth-epv2.onrender.com/api/auth/register', { username, email, password }, { withCredentials: true });
             console.log(res.data.message);
             navigate('/login'); // Redirect to login page after successful registration
         } catch (err) {

@@ -11,7 +11,7 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post('https://auth-epv2.onrender.com', { email, password }, { withCredentials: true });
+            const res = await axios.post('https://auth-epv2.onrender.com/api/auth/login', { email, password }, { withCredentials: true });
             console.log(res.data.message);
         } catch (err) {
             console.error(err.response.data.message);
