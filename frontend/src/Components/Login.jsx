@@ -10,11 +10,30 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError('');
         try {
-            const res = await axios.post('https://auth-epv2.onrender.com/api/auth/login', { email, password }, { withCredentials: true });
-            console.log(res.data.message);
+            const res = await axios.post(
+                'https://auth-epv2.onrender.com/api/auth/login',
+                { email, password },
+                {
+                    withCredentials: true,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                }
+            );
+            if (res.status === 200) {
+                // Store token or user data if needed
+                localStorage.setItem('isAuthenticated', 'true');
+                navigate('/dashboard'); // Redirect to protected route
+            }
         } catch (err) {
-            console.error(err.response.data.message);
+            setError(
+                err.response?.data?.message || 
+                'Login failed. Please check your credentials.'
+            );
+            console.error('Login error:', err.response?.data || err.message);
         }
     };
 

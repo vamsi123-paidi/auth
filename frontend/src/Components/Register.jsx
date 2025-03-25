@@ -11,12 +11,29 @@ const Register = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError('');
         try {
-            const res = await axios.post('https://auth-epv2.onrender.com/api/auth/register', { username, email, password }, { withCredentials: true });
-            console.log(res.data.message);
-            navigate('/login'); // Redirect to login page after successful registration
+            const res = await axios.post(
+                'https://auth-epv2.onrender.com/api/auth/register',
+                { username, email, password },
+                {
+                    withCredentials: true,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                }
+            );
+            if (res.status === 201) {
+                navigate('/login');
+            }
         } catch (err) {
-            setError(err.response?.data?.error || 'Registration failed. Please try again.');
+            setError(
+                err.response?.data?.message || 
+                err.response?.data?.error || 
+                'Registration failed. Please try again.'
+            );
+            console.error('Registration error:', err.response?.data || err.message);
         }
     };
 
