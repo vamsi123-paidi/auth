@@ -3,39 +3,55 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
-    const [username, setUsername] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const navigate = useNavigate();
-
-    const handleSubmit = async (e) => {
+    const [formData, setFormData] = useState({
+        username: '',
+        email: '',
+        password: ''
+      });
+      const [error, setError] = useState('');
+      const [isLoading, setIsLoading] = useState(false);
+      const navigate = useNavigate();
+    
+      const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+        setIsLoading(true);
+    
         try {
-            const res = await axios.post(
-                'https://auth-epv2.onrender.com/api/auth/register',
-                { username, email, password },
-                {
-                    withCredentials: true,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    }
-                }
-            );
-            if (res.status === 201) {
-                navigate('/login');
+          const response = await axios.post(
+            'https://auth-epv2.onrender.com/api/auth/register',
+            formData,
+            {
+              withCredentials: true,
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+              },
+              timeout: 10000 // 10 second timeout
             }
+          );
+    
+          if (response.status === 201) {
+            navigate('/login');
+          }
         } catch (err) {
-            setError(
-                err.response?.data?.message || 
-                err.response?.data?.error || 
-                'Registration failed. Please try again.'
-            );
-            console.error('Registration error:', err.response?.data || err.message);
+          if (err.code === 'ECONNABORTED') {
+            setError('Request timeout. Please try again.');
+          } else if (err.response) {
+            // Server responded with error status
+            setError(err.response.data?.message || 'Registration failed');
+          } else if (err.request) {
+            // Request was made but no response
+            setError('Network error. Please check your connection.');
+          } else {
+            setError('An unexpected error occurred');
+          }
+          console.error('Registration error:', err);
+        } finally {
+          setIsLoading(false);
         }
-    };
+      };
+    
 
     return (
         <div>
