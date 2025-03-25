@@ -10,10 +10,9 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
 const allowedOrigins = [
   'https://auth-red-three.vercel.app',
-  'http://localhost:3000', 
+  'http://localhost:3000',
   'http://localhost:5173'
 ];
 
@@ -21,20 +20,21 @@ app.use(cors({
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = `The CORS policy for this site does not allow access from the specified Origin.`;
-      return callback(new Error(msg), false);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
     }
-    return callback(null, true);
+    return callback(new Error('Not allowed by CORS'), false);
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  credentials: true,
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 }));
 
-// Handle preflight requests
+// Explicitly handle OPTIONS requests
 app.options('*', cors());
+
 // Routes
 app.use('/api/auth', authRoutes);
 
